@@ -85,8 +85,8 @@ JWT_SECRET=tvoj_super_tajny_secret_kluc
 - [x] Vytvoriť `middleware/auth.ts` pre JWT verifikáciu
 - [x] Pridať auth routes do `server.ts`
 
-#### ⬜ **Krok 5: Todo Model & Schema**
-- [ ] Vytvoriť Todo interface v `lib/types.ts`
+#### ✅ **Krok 5: Todo Model & Schema**
+- [x] Vytvoriť Todo interface v `lib/types.ts`
   ```typescript
   export interface Todo {
     _id?: string;
@@ -98,27 +98,27 @@ JWT_SECRET=tvoj_super_tajny_secret_kluc
     updatedAt?: Date;
   }
   ```
-- [ ] Vytvoriť TodoSchema v `lib/schema.ts`
+- [x] Vytvoriť TodoSchema v `lib/schema.ts`
   - title (required, string)
   - description (optional, string)
   - completed (boolean, default: false)
   - userId (ObjectId, ref: User, required)
   - timestamps (createdAt, updatedAt)
-- [ ] Vytvoriť `models/Todo.ts` s Mongoose modelom
+- [x] Vytvoriť `models/Todo.ts` s Mongoose modelom
 
-#### ⬜ **Krok 6: Todo Routes & Controller**
-- [ ] Vytvoriť `routes/todos.ts` s routes:
+#### ✅ **Krok 6: Todo Routes & Controller**
+- [x] Vytvoriť `routes/todos.ts` s routes:
   - `GET /api/todos` - získať všetky todos pre prihláseného používateľa
   - `POST /api/todos` - vytvoriť nový todo
   - `PUT /api/todos/:id` - aktualizovať todo
   - `DELETE /api/todos/:id` - vymazať todo
-- [ ] Vytvoriť `controllers/todoController.ts`:
+- [x] Vytvoriť `controllers/todoController.ts`:
   - `getTodos()` - získať todos len pre aktuálneho usera
   - `createTodo()` - vytvoriť nový todo s userId
   - `updateTodo()` - aktualizovať todo (len vlastník)
   - `deleteTodo()` - vymazať todo (len vlastník)
-- [ ] Pridať `authMiddleware` na všetky todo routes
-- [ ] Pridať todo routes do `server.ts`
+- [x] Pridať `authMiddleware` na všetky todo routes
+- [x] Pridať todo routes do `server.ts`
 
 #### ⬜ **Krok 7: Error Handling & Validácia**
 - [ ] Pridať validáciu request body (napr. pomocou express-validator)
@@ -178,16 +178,16 @@ JWT_SECRET=tvoj_super_tajny_secret_kluc
   - [x] Použiť `register()` action
   - [x] Pridať link na Login stránku
 
-#### ⬜ **Krok 7: Route Guards (Ochrana Routes)**
-- [ ] Vytvoriť `router/index.ts` s navigation guards
-- [ ] Pridať `beforeEach` guard:
+#### ✅ **Krok 7: Route Guards (Ochrana Routes)**
+- [x] Vytvoriť `router/index.ts` s navigation guards
+- [x] Pridať `beforeEach` guard:
   - Ak používateľ nie je prihlásený a ide na chránenú stránku → redirect na `/`
   - Ak používateľ je prihlásený a ide na Login/Register → redirect na `/todos`
-- [ ] Vytvoriť helper funkciu `isAuthenticated()` v auth store
+- [x] Vytvoriť helper funkciu `isAuthenticated()` v auth store
 
 #### ⬜ **Krok 8: Pinia Store - Todos**
-- [ ] Vytvoriť `stores/todos.ts` s `useTodosStore`
-- [ ] Definovať `TodosState` interface:
+- [x] Vytvoriť `stores/todos.ts` s `useTodosStore`
+- [x] Definovať `TodosState` interface:
   ```typescript
   interface TodosState {
     todos: Todo[];
@@ -195,15 +195,15 @@ JWT_SECRET=tvoj_super_tajny_secret_kluc
     error: string | null;
   }
   ```
-- [ ] Implementovať actions:
+- [x] Implementovať actions:
   - `fetchTodos()` - načítať todos z API
   - `createTodo(title, description?)` - vytvoriť nový todo
   - `updateTodo(id, updates)` - aktualizovať todo
   - `deleteTodo(id)` - vymazať todo
   - `toggleTodo(id)` - prepnúť completed status
 
-#### ⬜ **Krok 9: Todo Interface & Types**
-- [ ] Rozšíriť `lib/interfaces.ts`:
+#### ✅ **Krok 9: Todo Interface & Types**
+- [x] Rozšíriť `lib/interfaces.ts`:
   ```typescript
   export interface Todo {
     _id: string;
@@ -230,15 +230,15 @@ JWT_SECRET=tvoj_super_tajny_secret_kluc
   - Tlačidlá: Submit, Cancel
   - Emit: `submit` s todo dátami
 
-#### ⬜ **Krok 11: Todo Stránka**
-- [ ] Vytvoriť `pages/Todos.vue`:
+#### ✅ **Krok 11: Todo Stránka**
+- [x] Vytvoriť `pages/Todos.vue`:
   - Použiť `useTodosStore` a `useAuthStore`
   - Zobraziť zoznam todos pomocou `TodoItem`
   - Pridať tlačidlo "Pridať nový todo"
   - Zobraziť loading state
   - Zobraziť error messages
   - Pridať logout tlačidlo
-- [ ] Pridať route `/todos` do routeru
+- [x] Pridať route `/todos` do routeru
 - [ ] Vytvoriť `layout/AuthenticatedLayout.vue` (voliteľné)
 
 #### ⬜ **Krok 12: UI/UX Vylepšenia**
@@ -268,7 +268,7 @@ todoapp-vuejs-express-mongo/
 │   │   │   └── db.ts              ✅ MongoDB pripojenie
 │   │   ├── controllers/
 │   │   │   ├── authController.ts  ✅ Auth logika
-│   │   │   └── todoController.ts  ⬜ TODO
+│   │   │   └── todoController.ts  ✅ Todo logika
 │   │   ├── lib/
 │   │   │   ├── schema.ts          ✅ Mongoose schemas
 │   │   │   └── types.ts           ✅ TypeScript typy
@@ -276,10 +276,10 @@ todoapp-vuejs-express-mongo/
 │   │   │   └── auth.ts            ✅ JWT middleware
 │   │   ├── models/
 │   │   │   ├── User.ts            ✅ User model
-│   │   │   └── Todo.ts            ⬜ TODO
+│   │   │   └── Todo.ts            ✅ Todo model
 │   │   ├── routes/
 │   │   │   ├── authRoutes.ts      ✅ Auth routes
-│   │   │   └── todos.ts           ⬜ TODO
+│   │   │   └── todos.ts           ✅ Todo routes
 │   │   └── server.ts              ✅ Express server
 │   ├── .env                       ⚠️ Vytvoriť manuálne
 │   └── package.json
@@ -301,12 +301,12 @@ todoapp-vuejs-express-mongo/
 │   │   ├── pages/
 │   │   │   ├── Login.vue          ✅
 │   │   │   ├── Register.vue       ✅
-│   │   │   └── Todos.vue          ⬜ TODO
+│   │   │   └── Todos.vue          ✅
 │   │   ├── routes/
 │   │   │   └── index.ts           ✅ Vue Router
 │   │   ├── stores/
 │   │   │   ├── auth.ts            ✅ Auth store
-│   │   │   └── todos.ts           ⬜ TODO
+│   │   │   └── todos.ts           ✅ Todo store
 │   │   ├── App.vue                ✅
 │   │   └── main.ts                ✅
 │   └── package.json
@@ -362,9 +362,9 @@ todoapp-vuejs-express-mongo/
 
 ## ✅ Progress Tracker
 
-**Backend:** 4/7 krokov dokončených (57%)  
-**Frontend:** 6/13 krokov dokončených (46%)  
-**Celkový Progress:** 10/20 krokov (50%)
+**Backend:** 6/7 krokov dokončených (86%)  
+**Frontend:** 11/13 krokov dokončených (85%)  
+**Celkový Progress:** 17/20 krokov (85%)
 
 ---
 

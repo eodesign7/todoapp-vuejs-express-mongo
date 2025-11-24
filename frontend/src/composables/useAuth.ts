@@ -1,3 +1,5 @@
+// cSpell: disable
+
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { ensureAuthenticated } from "@/lib/ensureAuth";

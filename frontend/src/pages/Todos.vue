@@ -1,8 +1,11 @@
+// cSpell: disable
+
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import Header from "@/components/Header.vue";
 import BaseInput from "@/components/BaseInput.vue";
 import BaseButton from "@/components/BaseButton.vue";
+import TodoItem from "@/components/TodoItem.vue";
 import { useTodosStore } from "@/stores/todos";
 import { useAuthStore } from "@/stores/auth";
 
@@ -40,47 +43,34 @@ const deleteTodo = (id: string) => todos.deleteTodo(id);
         <Header />
 
         <main class="content">
-            <section class="card">
-                <header class="card-header">
-                    <div>
-                        <p class="eyebrow">Prihlásený používateľ</p>
-                        <strong>{{ auth.user?.email }}</strong>
-                    </div>
-                </header>
+            <section class="intro">
+                <div>
+                    <p class="eyebrow">Prihlásený používateľ</p>
+                    <strong>{{ auth.user?.email }}</strong>
+                </div>
+                <span class="pill">Dnes {{ new Date().toLocaleDateString("sk-SK") }}</span>
+            </section>
 
+            <section class="composer">
                 <form class="todo-form" @submit.prevent="createTodo">
                     <BaseInput label="Názov úlohy" v-model="title" />
-                    <textarea
-                        v-model="description"
-                        placeholder="Doplň detaily (voliteľné)"
-                    ></textarea>
-                    <BaseButton :disabled="todos.loading">
+                    <textarea v-model="description" placeholder="Doplň detaily (voliteľné)"></textarea>
+                    <BaseButton size="lg" :disabled="todos.loading">
                         {{ todos.loading ? "Ukladám..." : "Pridať úlohu" }}
                     </BaseButton>
                 </form>
-
                 <div v-if="todos.error" class="error">{{ todos.error }}</div>
+            </section>
 
-                <ul class="todo-list">
-                    <li v-for="todo in todos.items" :key="todo._id" :class="{ done: todo.completed }">
-                        <label>
-                            <input
-                                type="checkbox"
-                                :checked="todo.completed"
-                                @change="toggleTodo(todo._id)"
-                            />
-                            <span>
-                                <strong>{{ todo.title }}</strong>
-                                <small v-if="todo.description">{{ todo.description }}</small>
-                            </span>
-                        </label>
+            <section class="todo-stack">
+                <transition-group tag="ul" name="fade" class="todo-list">
+                    <TodoItem v-for="todo in todos.items" :key="todo._id" :todo="todo" @toggle="toggleTodo"
+                        @delete="deleteTodo" />
+                </transition-group>
 
-                        <button class="delete" @click="deleteTodo(todo._id)">Vymazať</button>
-                    </li>
-                    <li v-if="!todos.items.length" class="empty">
-                        Zatiaľ nemáš žiadne úlohy. Pridaj prvú!
-                    </li>
-                </ul>
+                <div v-if="!todos.items.length" class="empty">
+                    Zatiaľ nemáš žiadne úlohy. Pridaj prvú! ✍️
+                </div>
             </section>
         </main>
     </div>
@@ -89,7 +79,6 @@ const deleteTodo = (id: string) => todos.deleteTodo(id);
 <style scoped>
 .todos-container {
     min-height: 100vh;
-    background: #f5f7fb;
 }
 
 .content {
@@ -98,43 +87,69 @@ const deleteTodo = (id: string) => todos.deleteTodo(id);
     padding: 0 20px 60px;
 }
 
-.card {
-    background: white;
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+.content > section {
+    margin-bottom: 32px;
 }
 
-.card-header {
+.intro {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid var(--stroke);
+    padding-bottom: 16px;
 }
 
 .eyebrow {
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.3em;
     font-size: 0.75rem;
-    color: #94a3b8;
-    margin-bottom: 4px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.pill {
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: #4f46e5;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+}
+
+.composer {
+    background: var(--surface);
+    border-radius: 28px;
+    border: 1px solid var(--stroke);
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
 }
 
 .todo-form {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 textarea {
-    min-height: 80px;
+    min-height: 90px;
     resize: vertical;
-    padding: 10px 12px;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
+    padding: 14px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: white;
     font-family: inherit;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+textarea:focus {
+    border-color: #9a9ff9;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(154, 159, 249, 0.2);
+}
+
+.todo-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .todo-list {
@@ -146,49 +161,29 @@ textarea {
     gap: 12px;
 }
 
-.todo-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-}
-
-.todo-list li.done {
-    opacity: 0.6;
-}
-
-.todo-list label {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-}
-
-.todo-list strong {
-    display: block;
-}
-
-.todo-list small {
-    color: #64748b;
-}
-
-.todo-list .delete {
-    border: none;
-    background: transparent;
+.error {
     color: #dc2626;
-    cursor: pointer;
+    margin-top: 8px;
+    text-align: center;
 }
 
-.todo-list .empty {
-    justify-content: center;
-    color: #94a3b8;
+.empty {
+    border: 1px dashed var(--stroke);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    color: var(--muted);
     font-style: italic;
 }
 
-.error {
-    color: #dc2626;
-    text-align: center;
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 0.25s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(8px);
 }
 </style>

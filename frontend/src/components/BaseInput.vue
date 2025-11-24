@@ -21,15 +21,15 @@ const model = computed({
 </script>
 
 <template>
-    <div class="input-root">
-        <label v-if="label">{{ label }}</label>
+    <label class="input-root">
+        <span v-if="label">{{ label }}</span>
         <input
             :type="type"
             :placeholder="placeholder"
             v-model="model"
             class="input"
         />
-    </div>
+    </label>
 </template>
 
 <style scoped>
@@ -37,23 +37,22 @@ const model = computed({
     display: flex;
     flex-direction: column;
     gap: 6px;
-}
-
-label {
-    font-size: 14px;
-    color: #333;
+    font-size: 0.9rem;
+    color: var(--text-muted);
 }
 
 .input {
-    padding: 10px 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    transition: border-color 0.2s;
+    padding: 12px 14px;
+    font-size: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .input:focus {
-    border-color: #555;
+    border-color: #9a9ff9;
     outline: none;
+    box-shadow: 0 0 0 3px rgba(154, 159, 249, 0.25);
 }
 </style>

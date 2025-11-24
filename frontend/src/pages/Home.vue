@@ -38,33 +38,39 @@ const goToRegister = () => router.push("/register");
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(120deg, #2a4ad4, #6c63ff);
-    color: white;
+    background: linear-gradient(120deg, #fef8f1, #f0f2ff);
+    color: #1c1c1c;
     padding: 40px 20px;
     text-align: center;
 }
 
 .hero-content {
     max-width: 640px;
+    padding: 48px;
+    border-radius: 36px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.15);
 }
 
 .eyebrow {
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    font-size: 0.85rem;
+    letter-spacing: 0.28em;
+    font-size: 0.78rem;
+    color: var(--muted);
     margin-bottom: 12px;
-    color: rgba(255, 255, 255, 0.8);
 }
 
 h1 {
-    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-size: clamp(2.8rem, 6vw, 3.8rem);
     margin-bottom: 16px;
 }
 
 .subtitle {
     font-size: 1.2rem;
     margin-bottom: 32px;
-    color: rgba(255, 255, 255, 0.9);
+    color: #5c5c5c;
 }
 
 .actions {
@@ -81,13 +87,13 @@ h1 {
 }
 
 .primary {
-    background: white;
-    color: #2a4ad4;
+    background: #111;
+    color: white;
 }
 
 .ghost {
-    background: transparent;
-    border: 2px solid white;
-    color: white;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: #111;
 }
 </style>

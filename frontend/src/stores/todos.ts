@@ -1,3 +1,5 @@
+// cSpell: disable
+
 import { defineStore } from "pinia";
 import api from "@/lib/api";
 import type { Todo } from "@/lib/interfaces";

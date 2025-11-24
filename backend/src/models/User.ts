@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { UserSchema } from "@/lib/schema";
-import { User } from "@/lib/types";
+import { UserDocument } from "@/lib/types";
 
 // Hash password before save
 UserSchema.pre("save", async function (next) {
@@ -16,4 +16,4 @@ UserSchema.methods.comparePassword = function (candidatePassword: string) {
      return bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.model<User>("User", UserSchema);
+export default mongoose.model<UserDocument>("User", UserSchema);
