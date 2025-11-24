@@ -3,9 +3,9 @@ import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 
 import GuestLayout from "@/layout/GuestLayout.vue";
-import AuthCard from "@/components/ui/AuthCard.vue";
-import BaseInput from "@/components/ui/BaseInput.vue";
-import BaseButton from "@/components/ui/BaseButton.vue";
+import Card from "@/components/Card.vue";
+import BaseInput from "@/components/BaseInput.vue";
+import BaseButton from "@/components/BaseButton.vue";
 
 const email = ref("");
 const password = ref("");
@@ -19,7 +19,7 @@ const submit = async () => {
 
 <template>
     <GuestLayout>
-        <AuthCard>
+        <Card>
             <h2>Prihlásenie</h2>
 
             <form @submit.prevent="submit" class="form">
@@ -34,7 +34,7 @@ const submit = async () => {
                 Nemáš účet?
                 <router-link to="/register">Vytvoriť účet</router-link>
             </p>
-        </AuthCard>
+        </Card>
     </GuestLayout>
 </template>
 

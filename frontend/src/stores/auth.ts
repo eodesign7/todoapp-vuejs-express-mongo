@@ -10,6 +10,7 @@ export const useAuthStore = defineStore("auth", {
         token: localStorage.getItem("token") || null,
     }),
 
+    // Added getter for checking if user is authenticated
     getters: {
         isAuthenticated(): boolean { 
             return !!this.token && !!this.user;
