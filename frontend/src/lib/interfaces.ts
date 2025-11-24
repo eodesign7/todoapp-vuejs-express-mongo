@@ -8,11 +8,25 @@ export interface AuthState {
     token: string | null;
 }
 
-export interface Todo {
+export interface Project {
+    _id: string;
+    name: string;
+    description?: string;
+    color?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export type TaskStatus = "active" | "completed";
+
+export interface Task {
     _id: string;
     title: string;
     description?: string;
-    completed: boolean;
+    status: TaskStatus;
+    startTime?: string;
+    endTime?: string;
+    project: string;
     createdAt?: string;
     updatedAt?: string;
 }

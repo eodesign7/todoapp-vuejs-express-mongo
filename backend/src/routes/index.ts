@@ -1,11 +1,11 @@
 import { Router } from "express";
 import authRoutes from "./authRoutes";
-import todoRoutes from "./todos";
+import projectRoutes from "./projects";
 
 const apiRouter = Router();
 
 apiRouter.use("/auth", authRoutes);
-apiRouter.use("/todos", todoRoutes);
+apiRouter.use("/projects", projectRoutes);
 
 export default apiRouter;
 

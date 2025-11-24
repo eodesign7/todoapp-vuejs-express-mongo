@@ -7,11 +7,13 @@ import Home from "@/pages/Home.vue";
 import Login from "@/pages/Login.vue";
 import Register from "@/pages/Register.vue";
 import Todos from "@/pages/Todos.vue";
+import Overview from "@/pages/Overview.vue";
 
 const routes = [
     { path: "/", name: "Home", component: Home },
     { path: "/register", name: "Register", component: Register },
     { path: "/login", name: "Login", component: Login },
+    { path: "/overview", name: "Overview", component: Overview, meta: { requiresAuth: true } },
     { path: "/todos", name: "Todos", component: Todos, meta: { requiresAuth: true } },
 ];
 

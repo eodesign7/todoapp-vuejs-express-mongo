@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import type { TodoDocument, UserDocument } from "@/lib/types";
+import type { ProjectDocument, TaskDocument, UserDocument } from "@/lib/types";
 
 export const UserSchema = new Schema<UserDocument>({
     email: {
@@ -18,9 +18,9 @@ export const UserSchema = new Schema<UserDocument>({
     },
 });
 
-export const TodoSchema = new Schema<TodoDocument>(
+export const ProjectSchema = new Schema<ProjectDocument>(
     {
-        title: {
+        name: {
             type: String,
             required: true,
             trim: true,
@@ -30,15 +30,57 @@ export const TodoSchema = new Schema<TodoDocument>(
             type: String,
             maxlength: 500,
         },
-        completed: {
-            type: Boolean,
-            default: false,
+        color: {
+            type: String,
+            default: "#dbeafe",
+            match: /^#([0-9A-Fa-f]{3}){1,2}$/,
         },
-        user: {
+        owner: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
+            index: true,
         },
     },
     { timestamps: true },
 );
+
+ProjectSchema.index({ owner: 1, name: 1 }, { unique: true });
+
+export const TaskSchema = new Schema<TaskDocument>(
+    {
+        title: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 160,
+        },
+        description: {
+            type: String,
+            maxlength: 1000,
+        },
+        status: {
+            type: String,
+            enum: ["active", "completed"],
+            default: "active",
+            index: true,
+        },
+        startTime: Date,
+        endTime: Date,
+        project: {
+            type: Schema.Types.ObjectId,
+            ref: "Project",
+            required: true,
+            index: true,
+        },
+        owner: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+            index: true,
+        },
+    },
+    { timestamps: true },
+);
+
+TaskSchema.index({ owner: 1, project: 1, status: 1 });
