@@ -1,34 +1,11 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
-
-import { useRouter } from "vue-router";
 import GuestLayout from "@/layout/GuestLayout.vue";
 import Card from "@/components/Card.vue";
 import BaseInput from "@/components/BaseInput.vue";
 import BaseButton from "@/components/BaseButton.vue";
-import { ensureAuthenticated } from "@/lib/ensureAuth";
+import { useAuthForm } from "@/composables/useAuth";
 
-const email = ref("");
-const password = ref("");
-const auth = useAuthStore();
-const router = useRouter();
-const loading = ref(false);
-const error = ref("");
-
-const submit = async () => {
-    error.value = "";
-    loading.value = true;
-    try {
-        await auth.login(email.value, password.value);
-        const ok = await ensureAuthenticated();
-        if (ok) router.push("/todos");
-    } catch (err: any) {
-        error.value = err?.response?.data?.message ?? "Prihlásenie zlyhalo.";
-    } finally {
-        loading.value = false;
-    }
-};
+const { email, password, loading, error, submit } = useAuthForm("login");
 </script>
 
 <template>

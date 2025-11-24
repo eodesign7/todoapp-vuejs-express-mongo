@@ -1,20 +1,14 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
 import BaseButton from "@/components/BaseButton.vue";
+import { useAuthRedirect } from "@/composables/useAuth";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
-const auth = useAuthStore();
+const { redirectToTodosIfAuthenticated } = useAuthRedirect();
 
-onMounted(async () => {
-    if (!auth.user && auth.token) {
-        await auth.fetchMe();
-    }
-
-    if (auth.isAuthenticated) {
-        router.push("/todos");
-    }
+onMounted(() => {
+    redirectToTodosIfAuthenticated();
 });
 
 const goToLogin = () => router.push("/login");
