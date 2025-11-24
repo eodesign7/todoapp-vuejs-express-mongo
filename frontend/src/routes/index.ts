@@ -1,12 +1,12 @@
 // src/routes/index.ts
 import { createRouter, createWebHistory } from "vue-router";
 import { ensureAuthenticated } from "@/lib/ensureAuth";
+import { useAuthStore } from "@/stores/auth";
 
 import Home from "@/pages/Home.vue";
 import Login from "@/pages/Login.vue";
 import Register from "@/pages/Register.vue";
 import Todos from "@/pages/Todos.vue";
-import { useAuthStore } from "@/stores/auth";
 
 const routes = [
     { path: "/", name: "Home", component: Home },
@@ -24,11 +24,17 @@ router.beforeEach(async (to, _from, next) => {
     const auth = useAuthStore();
 
     if (to.meta.requiresAuth) {
-        const ok = await ensureAuthenticated("/login");
-        if (!ok) return;
+        const ok = await ensureAuthenticated();
+        if (!ok) {
+            next({ name: "Login" });
+            return;
+        }
     }
 
-    if ((to.name === "Login" || to.name === "Register") && auth.isAuthenticated) {
+    if (
+        (to.name === "Login" || to.name === "Register" || to.name === "Home") &&
+        auth.isAuthenticated
+    ) {
         next({ name: "Todos" });
         return;
     }

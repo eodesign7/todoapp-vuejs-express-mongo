@@ -1,8 +1,7 @@
-import { router } from "@/routes";
 import { useAuthStore } from "@/stores/auth";
 
-
-export const ensureAuthenticated = async (redirectPath: string = "/login"): Promise<boolean> => {
+// Overí, či máme načítaného používateľa; vráti true keď je prihlásený.
+export const ensureAuthenticated = async (): Promise<boolean> => {
     const auth = useAuthStore();
     // ak už je user načítaný a je prihlásený, nič nerob
     if (auth.isAuthenticated) return true;
@@ -13,7 +12,5 @@ export const ensureAuthenticated = async (redirectPath: string = "/login"): Prom
         if (auth.isAuthenticated) return true;
     }
 
-    // nič nevyšlo → presmeruj na home
-    router.push(redirectPath);
     return false;
 };

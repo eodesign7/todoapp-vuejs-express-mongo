@@ -1,28 +1,26 @@
 <!-- src/layout/GuestLayout.vue -->
-<script setup lang=""></script>
+<script setup lang="ts"></script>
 
 <template>
     <div class="layout">
         <div class="box">
-            <Slot />
+            <slot />
         </div>
-        <slot />
     </div>
 </template>
 
 <style scoped>
 .layout {
     min-height: 100vh;
-    background: white;
+    background: linear-gradient(135deg, #f5f5f5, #dfe8ff);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 24px;
 }
 
 .box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 100%;
+    max-width: 420px;
 }
 </style>
