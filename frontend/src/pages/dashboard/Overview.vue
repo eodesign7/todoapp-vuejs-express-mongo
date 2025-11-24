@@ -3,6 +3,9 @@ import { onMounted, reactive, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useWorkspaceStore } from "@/stores/projects";
 import { useAuthStore } from "@/stores/auth";
+import RootLayout from "@/layout/RootLayout.vue";
+import UserButton from "@/components/UserButton.vue";
+import type { ProjectFormShape } from "@/types/todoForms";
 
 const workspace = useWorkspaceStore();
 const auth = useAuthStore();
@@ -15,7 +18,7 @@ const defaultColor: string = colorOptions[0];
 const quickTask = reactive<Record<string, string>>({});
 const quickLoading = reactive<Record<string, boolean>>({});
 const showProjectModal = ref(false);
-const projectForm = reactive({
+const projectForm = reactive<ProjectFormShape>({
     name: "",
     description: "",
     color: defaultColor,
@@ -86,36 +89,45 @@ const handleCreateProject = async () => {
         // error already handled in store
     }
 };
+
+const handleLogout = () => {
+    auth.logout();
+    router.push({ name: "Login" });
+};
 </script>
 
 <template>
-    <div class="workspace">
-        <aside class="sidebar">
-            <div class="logo-block">
-                <div class="logo-dot">✸</div>
-                <div>
-                    <p class="eyebrow">HealDocs</p>
-                    <strong>Todo List</strong>
+    <RootLayout>
+        <template #sidebar>
+            <div class="sidebar">
+                <div class="logo-block">
+                    <div class="logo-dot">✸</div>
+                    <div>
+                        <p class="eyebrow">HealDocs</p>
+                        <strong>Todo List</strong>
+                    </div>
                 </div>
-            </div>
 
-            <nav class="sidebar-nav">
-                <p>Navigation</p>
-                <ul>
-                    <li :class="{ active: route.name === 'Overview' }" @click="goTo('Overview')">
-                        Overview
-                    </li>
-                    <li :class="{ active: route.name === 'Todos' }" @click="goTo('Todos')">
-                        Todo List
-                    </li>
-                </ul>
-            </nav>
+                <nav class="sidebar-nav">
+                    <p>Navigation</p>
+                    <ul>
+                        <li :class="{ active: route.name === 'Overview' }" @click="goTo('Overview')">
+                            Overview
+                        </li>
+                        <li :class="{ active: route.name === 'Todos' }" @click="goTo('Todos')">
+                            Todo List
+                        </li>
+                    </ul>
+                </nav>
 
-            <div class="lists-header">
-                <span>My Todo Lists</span>
-                <span class="count-pill">{{ workspace.projects.length }}</span>
+                <div class="lists-header">
+                    <span>My Todo Lists</span>
+                    <span class="count-pill">{{ workspace.projects.length }}</span>
+                </div>
+
+                <UserButton :email="auth.user?.email || 'anonym'" @logout="handleLogout" />
             </div>
-        </aside>
+        </template>
 
         <section class="overview-board">
             <header class="board-header">
@@ -204,18 +216,10 @@ const handleCreateProject = async () => {
                 </div>
             </div>
         </div>
-    </div>
+    </RootLayout>
 </template>
 
 <style scoped>
-.workspace {
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    background: #f9fafb;
-    color: #111827;
-}
-
 .sidebar {
     background: #f5f5f4;
     border-right: 1px solid #e4e4e7;
@@ -477,10 +481,6 @@ const handleCreateProject = async () => {
 }
 
 @media (max-width: 1024px) {
-    .workspace {
-        grid-template-columns: 1fr;
-    }
-
     .sidebar {
         flex-direction: row;
         overflow-x: auto;

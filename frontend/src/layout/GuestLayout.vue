@@ -1,4 +1,3 @@
-<!-- src/layout/GuestLayout.vue -->
 <script setup lang="ts"></script>
 
 <template>
@@ -7,7 +6,7 @@
             <slot />
         </div>
     </div>
- </template>
+</template>
 
 <style scoped>
 .layout {

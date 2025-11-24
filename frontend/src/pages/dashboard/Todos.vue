@@ -5,7 +5,11 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue"
 import { useAuthStore } from "@/stores/auth";
 import { useWorkspaceStore } from "@/stores/projects";
 import type { Task } from "@/lib/interfaces";
+import type { ProjectFormShape, TaskFormShape } from "@/types/todoForms";
 import { useRouter, useRoute } from "vue-router";
+import { filterTasksByQuery, formatTaskWindow, timeStringToISO } from "@/utils/todoHelpers";
+import RootLayout from "@/layout/RootLayout.vue";
+import UserButton from "@/components/UserButton.vue";
 
 const auth = useAuthStore();
 const workspace = useWorkspaceStore();
@@ -15,52 +19,22 @@ const route = useRoute();
 const colorOptions = ["#dbeafe", "#ddd6fe", "#fbcfe8", "#fde68a", "#bef264", "#bfdbfe"] as const;
 const defaultColor: string = colorOptions[0];
 
-interface ProjectForm {
-    name: string;
-    description: string;
-    color: string;
-}
-
-interface TaskForm {
-    title: string;
-    description: string;
-    startTime: string;
-    endTime: string;
-}
-
 const showLists = ref(true);
 const showProjectModal = ref(false);
-const showProfileMenu = ref(false);
 const openTaskMenuId = ref<string | null>(null);
 const searchQuery = ref("");
 const showInlineComposer = ref(false);
-const projectForm = reactive<ProjectForm>({
+const projectForm = reactive<ProjectFormShape>({
     name: "",
     description: "",
     color: defaultColor,
 });
-const taskForm = reactive<TaskForm>({
+const taskForm = reactive<TaskFormShape>({
     title: "",
     description: "",
     startTime: "",
     endTime: "",
 });
-const timeFormatter = new Intl.DateTimeFormat("sk-SK", {
-    hour: "2-digit",
-    minute: "2-digit",
-});
-
-const timeToISO = (value: string) => {
-    if (!value) return undefined;
-    const [hoursPart, minutesPart] = value.split(":");
-    const hours = Number(hoursPart);
-    const minutes = Number(minutesPart);
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) return undefined;
-    const base = new Date();
-    base.setHours(hours, minutes, 0, 0);
-    return base.toISOString();
-};
-
 const accentColor = computed(() => workspace.activeProject?.color ?? "#d4d4d8");
 const activeProjectName = computed(() => workspace.activeProject?.name ?? "Select a list");
 const activeProjectDescription = computed(
@@ -80,16 +54,7 @@ const orderedTasks = computed(() => [
     ...tasksByTab.value.completed,
 ]);
 
-const visibleTasks = computed(() => {
-    const pool = orderedTasks.value;
-    if (!searchQuery.value.trim()) return pool;
-    const query = searchQuery.value.toLowerCase();
-    return pool.filter(
-        (task) =>
-            task.title.toLowerCase().includes(query) ||
-            (task.description ?? "").toLowerCase().includes(query),
-    );
-});
+const visibleTasks = computed(() => filterTasksByQuery(orderedTasks.value, searchQuery.value));
 
 const loadData = async () => {
     if (!auth.user && auth.token) {
@@ -106,7 +71,6 @@ const ensureTasks = async (projectId: string | null) => {
 };
 
 const closeMenus = () => {
-    showProfileMenu.value = false;
     openTaskMenuId.value = null;
 };
 
@@ -126,15 +90,6 @@ watch(
         await ensureTasks(id);
     },
 );
-
-const formatTaskWindow = (task: Task) => {
-    if (task.startTime && task.endTime) {
-        return `${timeFormatter.format(new Date(task.startTime))} – ${timeFormatter.format(
-            new Date(task.endTime),
-        )}`;
-    }
-    return "Flexibilné";
-};
 
 const resetProjectForm = () => {
     projectForm.name = "";
@@ -166,8 +121,8 @@ const handleCreateTask = async () => {
     await workspace.createTask(projectId, {
         title: taskForm.title.trim(),
         description: taskForm.description.trim() || undefined,
-        startTime: timeToISO(taskForm.startTime),
-        endTime: timeToISO(taskForm.endTime),
+        startTime: timeStringToISO(taskForm.startTime),
+        endTime: timeStringToISO(taskForm.endTime),
     });
     resetTaskForm();
 };
@@ -202,12 +157,6 @@ const handleDeleteProject = async (projectId: string) => {
 const handleLogout = () => {
     auth.logout();
     router.push({ name: "Login" });
-    showProfileMenu.value = false;
-};
-
-const toggleProfileMenu = (event: MouseEvent) => {
-    event.stopPropagation();
-    showProfileMenu.value = !showProfileMenu.value;
 };
 
 const goTo = (name: string) => router.push({ name });
@@ -225,69 +174,58 @@ const submitInlineTask = async () => {
 </script>
 
 <template>
-    <div class="workspace">
-        <aside class="sidebar">
-            <div class="logo-block">
-                <div class="logo-dot">✸</div>
-                <div>
-                    <p class="eyebrow">HealDocs</p>
-                    <strong>Todo List</strong>
+    <RootLayout>
+        <template #sidebar>
+            <div class="sidebar">
+                <div class="logo-block">
+                    <div class="logo-dot">✸</div>
+                    <div>
+                        <p class="eyebrow">HealDocs</p>
+                        <strong>Todo List</strong>
+                    </div>
                 </div>
-            </div>
 
-            <nav class="sidebar-nav">
-                <p>Navigation</p>
-                <ul>
-                    <li :class="{ active: route.name === 'Overview' }" @click="goTo('Overview')">
-                        Overview
-                    </li>
-                    <li :class="{ active: route.name === 'Todos' }" @click="goTo('Todos')">
-                        Todo List
-                    </li>
-                </ul>
-            </nav>
+                <nav class="sidebar-nav">
+                    <p>Navigation</p>
+                    <ul>
+                        <li :class="{ active: route.name === 'Overview' }" @click="goTo('Overview')">
+                            Overview
+                        </li>
+                        <li :class="{ active: route.name === 'Todos' }" @click="goTo('Todos')">
+                            Todo List
+                        </li>
+                    </ul>
+                </nav>
 
-            <div class="lists-header" @click="showLists = !showLists">
-                <span>My Todo Lists</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-                    <path d="M6 9l6 6 6-6" :fill="showLists ? '#4b5563' : '#9ca3af'"></path>
-                </svg>
-            </div>
+                <div class="lists-header" @click="showLists = !showLists">
+                    <span>My Todo Lists</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" :fill="showLists ? '#4b5563' : '#9ca3af'"></path>
+                    </svg>
+                </div>
 
-            <transition name="fade">
-                <div v-if="showLists" class="list-stack">
-                    <div v-for="project in workspace.projects" :key="project._id"
-                        :class="['list-item', { active: project._id === workspace.activeProjectId }]" role="button"
-                        tabindex="0" @click="handleSelectProject(project._id)"
-                        @keydown.enter.prevent="handleSelectProject(project._id)">
-                        <span class="dot" :style="{ background: project.color }" />
-                        <div>
-                            <p>{{ project.name }}</p>
-                            <small>{{ project.description || "Bez popisu" }}</small>
+                <transition name="fade">
+                    <div v-if="showLists" class="list-stack">
+                        <div v-for="project in workspace.projects" :key="project._id"
+                            :class="['list-item', { active: project._id === workspace.activeProjectId }]" role="button"
+                            tabindex="0" @click="handleSelectProject(project._id)"
+                            @keydown.enter.prevent="handleSelectProject(project._id)">
+                            <span class="dot" :style="{ background: project.color }" />
+                            <div>
+                                <p>{{ project.name }}</p>
+                                <small>{{ project.description || "Bez popisu" }}</small>
+                            </div>
+                            <button class="ghost" @click.stop="handleDeleteProject(project._id)">
+                                <span aria-hidden="true">⋯</span>
+                            </button>
                         </div>
-                        <button class="ghost" @click.stop="handleDeleteProject(project._id)">
-                            <span aria-hidden="true">⋯</span>
-                        </button>
+                        <button class="ghost create" @click="showProjectModal = true">+ Add Project</button>
                     </div>
-                    <button class="ghost create" @click="showProjectModal = true">+ Add Project</button>
-                </div>
-            </transition>
+                </transition>
 
-            <div class="sidebar-profile">
-                <div class="profile-avatar">{{ auth.user?.email?.[0]?.toUpperCase() ?? "E" }}</div>
-                <div class="profile-info">
-                    <strong>{{ auth.user?.email || "anonym" }}</strong>
-                    <small>Product Lead</small>
-                </div>
-                <div class="profile-menu" @click.stop>
-                    <button class="ghost" aria-label="Profil" @click="toggleProfileMenu">⋯</button>
-                    <div v-if="showProfileMenu" class="dropdown">
-                        <button type="button" @click="showProfileMenu = false">Nastavenia</button>
-                        <button type="button" class="danger" @click="handleLogout">Odhlásiť</button>
-                    </div>
-                </div>
+                <UserButton :email="auth.user?.email || 'anonym'" @logout="handleLogout" />
             </div>
-        </aside>
+        </template>
 
         <section class="board" :style="{ '--accent-color': accentColor }">
             <header class="board-header">
@@ -390,18 +328,10 @@ const submitInlineTask = async () => {
                 </div>
             </div>
         </div>
-    </div>
+    </RootLayout>
 </template>
 
 <style scoped>
-.workspace {
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    background: #f9fafb;
-    color: #111827;
-}
-
 .sidebar {
     background: #f5f5f4;
     border-right: 1px solid #e4e4e7;
@@ -577,47 +507,6 @@ const submitInlineTask = async () => {
 
 .dropdown.dark button.danger {
     color: #fca5a5;
-}
-
-.sidebar-profile {
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 8px 0;
-}
-
-.profile-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: #111827;
-    color: #fff;
-    display: grid;
-    place-items: center;
-    font-weight: 600;
-}
-
-.profile-menu {
-    position: relative;
-}
-
-.profile-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
-}
-
-.profile-info strong {
-    font-size: 0.95rem;
-    color: #0f172a;
-}
-
-.profile-info small {
-    color: #6b7280;
-    font-size: 0.8rem;
 }
 
 .board {
@@ -904,11 +793,7 @@ const submitInlineTask = async () => {
 }
 
 @media (max-width: 1024px) {
-    .workspace {
-        grid-template-columns: 1fr;
-    }
-
-    .sidebar {
+.sidebar {
         flex-direction: row;
         overflow-x: auto;
     }

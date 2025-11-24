@@ -3,11 +3,11 @@ import { createRouter, createWebHistory } from "vue-router";
 import { ensureAuthenticated } from "@/lib/ensureAuth";
 import { useAuthStore } from "@/stores/auth";
 
-import Home from "@/pages/Home.vue";
-import Login from "@/pages/Login.vue";
-import Register from "@/pages/Register.vue";
-import Todos from "@/pages/Todos.vue";
-import Overview from "@/pages/Overview.vue";
+import Home from "@/pages/Landing/Home.vue";
+import Login from "@/pages/auth/Login.vue";
+import Register from "@/pages/auth/Register.vue";
+import Todos from "@/pages/dashboard/Todos.vue";
+import Overview from "@/pages/dashboard/Overview.vue";
 
 const routes = [
     { path: "/", name: "Home", component: Home },
