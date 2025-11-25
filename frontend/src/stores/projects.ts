@@ -82,7 +82,7 @@ export const useWorkspaceStore = defineStore("workspace", {
                 this.loadingTasks[projectId] = false;
             }
         },
-        async createProject(payload: { name: string; description?: string; color?: string }) {
+        async createProject(payload: { name: string; description?: string; color?: string; icon?: string }) {
             try {
                 const { data } = await api.post("/projects", payload);
                 this.projects.unshift(data.project);

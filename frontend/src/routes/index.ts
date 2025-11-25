@@ -1,4 +1,3 @@
-// src/routes/index.ts
 import { createRouter, createWebHistory } from "vue-router";
 import { ensureAuthenticated } from "@/lib/ensureAuth";
 import { useAuthStore } from "@/stores/auth";
@@ -6,15 +5,13 @@ import { useAuthStore } from "@/stores/auth";
 import Home from "@/pages/Landing/Home.vue";
 import Login from "@/pages/auth/Login.vue";
 import Register from "@/pages/auth/Register.vue";
-import Todos from "@/pages/dashboard/Todos.vue";
-import Overview from "@/pages/dashboard/Overview.vue";
+import Dashboard from "@/pages/Dashboard.vue";
 
 const routes = [
     { path: "/", name: "Home", component: Home },
     { path: "/register", name: "Register", component: Register },
     { path: "/login", name: "Login", component: Login },
-    { path: "/overview", name: "Overview", component: Overview, meta: { requiresAuth: true } },
-    { path: "/todos", name: "Todos", component: Todos, meta: { requiresAuth: true } },
+    { path: "/dashboard", name: "Dashboard", component: Dashboard, meta: { requiresAuth: true } },
 ];
 
 export const router = createRouter({
@@ -28,16 +25,16 @@ router.beforeEach(async (to, _from, next) => {
     if (to.meta.requiresAuth) {
         const ok = await ensureAuthenticated();
         if (!ok) {
-            next({ name: "Login" });
+            next({ name: "Home" });
             return;
         }
     }
 
     if (
-        (to.name === "Login" || to.name === "Register" || to.name === "Home") &&
+        (to.name === "Login" || to.name === "Register") &&
         auth.isAuthenticated
     ) {
-        next({ name: "Todos" });
+        next({ name: "Dashboard" });
         return;
     }
 

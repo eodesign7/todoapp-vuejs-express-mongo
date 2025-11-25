@@ -1,14 +1,23 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import BaseButton from "@/components/BaseButton.vue";
-import { useAuthRedirect } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import AppFooter from "@/components/AppFooter.vue";
 
 const router = useRouter();
-const { redirectToTodosIfAuthenticated } = useAuthRedirect();
+const auth = useAuthStore();
 
-onMounted(() => {
-    redirectToTodosIfAuthenticated();
+onMounted(async () => {
+    if (auth.token) {
+        try {
+            await auth.fetchMe();
+            if (auth.isAuthenticated) {
+                router.push("/dashboard");
+            }
+        } catch {
+            // Token invalid, stay on home
+        }
+    }
 });
 
 const goToLogin = () => router.push("/login");
@@ -16,61 +25,82 @@ const goToRegister = () => router.push("/register");
 </script>
 
 <template>
-    <section class="hero">
+    <div class="home-page">
+        <main class="hero">
         <div class="hero-content">
-            <p class="eyebrow">Vue 3 • Pinia • Express • MongoDB</p>
-            <h1>Spravuj svoje úlohy ako profík</h1>
+                <div class="logo">
+                    <span class="logo-icon">✓</span>
+                </div>
+                <h1>Todos</h1>
             <p class="subtitle">
-                Moderná ToDo appka s bezpečnou autentifikáciou a elegantným rozhraním.
+                    Jednoduchá správa úloh. Vytváraj zoznamy, pridávaj úlohy, 
+                    buď produktívny.
             </p>
 
             <div class="actions">
-                <BaseButton class="primary" @click="goToLogin">Prihlásiť sa</BaseButton>
-                <BaseButton class="ghost" @click="goToRegister">Vytvoriť účet</BaseButton>
+                    <button class="btn primary" @click="goToLogin">
+                        Prihlásiť sa
+                    </button>
+                    <button class="btn secondary" @click="goToRegister">
+                        Vytvoriť účet
+                    </button>
+                </div>
             </div>
+        </main>
+        <AppFooter />
         </div>
-    </section>
 </template>
 
 <style scoped>
-.hero {
+.home-page {
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(145deg, #f9fafb 0%, #f3f4f6 100%);
+}
+
+.hero {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(120deg, #fef8f1, #f0f2ff);
-    color: #1c1c1c;
-    padding: 40px 20px;
-    text-align: center;
+    padding: 40px 24px;
 }
 
 .hero-content {
-    max-width: 640px;
-    padding: 48px;
-    border-radius: 36px;
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.15);
+    text-align: center;
+    max-width: 400px;
 }
 
-.eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.28em;
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-bottom: 12px;
+.logo {
+    margin-bottom: 24px;
+}
+
+.logo-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    background: #111827;
+    color: #fff;
+    border-radius: 20px;
+    font-size: 2rem;
+    font-weight: 700;
 }
 
 h1 {
-    font-size: clamp(2.8rem, 6vw, 3.8rem);
-    margin-bottom: 16px;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
 }
 
 .subtitle {
-    font-size: 1.2rem;
-    margin-bottom: 32px;
-    color: #5c5c5c;
+    font-size: 1.1rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0 0 32px;
 }
 
 .actions {
@@ -79,21 +109,41 @@ h1 {
     gap: 12px;
 }
 
-@media (min-width: 520px) {
+.btn {
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn.primary {
+    background: #111827;
+    color: #fff;
+}
+
+.btn.primary:hover {
+    background: #1f2937;
+    transform: translateY(-1px);
+}
+
+.btn.secondary {
+    background: #fff;
+    color: #111827;
+    border: 1px solid #e5e7eb;
+}
+
+.btn.secondary:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+@media (min-width: 480px) {
     .actions {
         flex-direction: row;
         justify-content: center;
     }
-}
-
-.primary {
-    background: #111;
-    color: white;
-}
-
-.ghost {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    color: #111;
 }
 </style>

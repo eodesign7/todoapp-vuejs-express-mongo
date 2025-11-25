@@ -1,5 +1,3 @@
-// cSpell: disable
-
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { ensureAuthenticated } from "@/lib/ensureAuth";
@@ -7,34 +5,32 @@ import { useAuthStore } from "@/stores/auth";
 
 type AuthMode = "login" | "register";
 
-// Rieši presmerovania podľa stavu prihlásenia.
 export const useAuthRedirect = () => {
     const router = useRouter();
     const auth = useAuthStore();
 
-    const redirectToTodosIfAuthenticated = async () => {
+    const redirectToDashboardIfAuthenticated = async () => {
         if (!auth.user && auth.token) {
             await auth.fetchMe();
         }
 
         if (auth.isAuthenticated) {
-            router.push("/todos");
+            router.push("/dashboard");
         }
     };
 
     const ensureRouteAuth = async () => {
         const ok = await ensureAuthenticated();
-        if (!ok) router.push("/login");
+        if (!ok) router.push("/");
         return ok;
     };
 
     return {
-        redirectToTodosIfAuthenticated,
+        redirectToDashboardIfAuthenticated,
         ensureRouteAuth,
     };
 };
 
-// Zdieľaná logika pre login/register formulár.
 export const useAuthForm = (mode: AuthMode) => {
     const email = ref("");
     const password = ref("");
@@ -61,7 +57,7 @@ export const useAuthForm = (mode: AuthMode) => {
 
             await action(email.value, password.value);
             const ok = await ensureAuthenticated();
-            if (ok) router.push("/todos");
+            if (ok) router.push("/dashboard");
         } catch (err: any) {
             error.value = err?.response?.data?.message ?? defaultError;
         } finally {
@@ -77,4 +73,3 @@ export const useAuthForm = (mode: AuthMode) => {
         submit,
     };
 };
-

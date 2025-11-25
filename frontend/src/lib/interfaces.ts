@@ -13,6 +13,7 @@ export interface Project {
     name: string;
     description?: string;
     color?: string;
+    icon?: string;
     createdAt?: string;
     updatedAt?: string;
 }
